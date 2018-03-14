@@ -1,0 +1,10 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/NightscoutShareServer/obj/Debug
+/NightscoutShareServer/obj/Release
+/NightscoutShareServer/bin
+/NightscoutShareServer/Properties
+/.vs/
+/NightscoutShareServer/obj/DebugWithMocked

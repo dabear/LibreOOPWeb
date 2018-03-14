@@ -1,0 +1,52 @@
+﻿
+
+@{
+    
+    ViewBag.Title = "Home Page";
+
+}
+
+<div>
+    <h1>Welcome to LibreOOPAlgoWeb</h1>
+    <p>TODO: more description here </p>
+</div>
+
+@section Scripts {
+    <script>
+        var url = "@Url.Action("Index", "Glucose")";
+        //nightscoutSite is unused here but included just so you can verify that the environment setting worked
+        var nightscoutSite = "@LibreOOPWeb.Utils.Config.NsHost";
+        
+
+        var $loadglucose = $("#loadglucose"),
+            $glucoseinfo = $("#glucoseinfo"),
+            $hideglucose = $("#hideglucose");
+
+        $hideglucose.click(function () {
+            $glucoseinfo.find("table").remove();
+
+        });
+        Number.prototype.round = function (places) {
+            return +(Math.round(this + "e+" + places) + "e-" + places);
+        }
+
+
+
+        $loadglucose.click(function () {
+            $.ajax({
+                url: url,
+                dataType: 'json',
+                success: function (data) {
+                    $glucoseinfo.find("table").remove();
+                    var pretty = prettyPrint(manipulateResponse(data), { maxDepth: 5 })
+                    $glucoseinfo.append(pretty);
+                    $hideglucose.css("visibility", "visible")
+                    enableMockedMode && alert("These data are mocked (don't trust them)!");
+                },
+                error: function (data, status, error) {
+                    alert("Could not retrieve glucose data, please verify your nightscout url:  " + status + ", " + error);
+                }
+            });
+        });
+    </script>
+}

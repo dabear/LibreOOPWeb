@@ -1,0 +1,35 @@
+﻿
+
+@{
+    
+    ViewBag.Title = "Logs";
+
+}
+
+<div>
+    <h1>Logs</h1>
+    <p>This is a custom server that behaves like a Dexcom Share server, but will fetch its glucose values from nightscout</p>
+    <p>To view todays logs, please define an environment variable (app setting in azure) called Log_Secret and use a value of at least 12 characters</p>
+    <p>
+       You must match that secret in the form below to be able to view logs
+    </p>
+
+   @using (Html.BeginForm("VerifyViewLog", "Home", FormMethod.Post))
+{
+    <input type="password" name="logsecret" />
+
+    <input type="submit" value="Submit to view logs" />
+}
+
+</div>
+
+@if (ViewBag.logdata != null) {
+ <h2>logdata</h2>
+ <pre>@ViewBag.logdata</pre>
+}
+
+@section Scripts {
+    <script>
+      
+    </script>
+}
