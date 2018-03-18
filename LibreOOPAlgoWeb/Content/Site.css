@@ -20,5 +20,24 @@
 input,
 select,
 textarea {
-    max-width: 280px;
+    max-width: 450px;
+}
+
+td {
+    padding: 10px;
+}
+
+#log {
+    max-width: 700px;
+    width: 700px;
+}
+
+.notavailable{
+    font-weight: bolder;
+    color: red;
+}
+
+.available {
+    font-weight: bolder;
+    color: green
 }

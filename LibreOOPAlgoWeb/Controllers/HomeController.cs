@@ -28,6 +28,11 @@ namespace LibreOOPWeb.Controllers
             return View();
         }
 
+        public ActionResult UploadRawReading() {
+
+            return View("UploadRawReading");
+        }
+
         public ActionResult ViewLogs()
         {
             var mvcName = typeof(Controller).Assembly.GetName();

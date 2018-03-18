@@ -1,0 +1,175 @@
+﻿
+
+@{
+    
+    ViewBag.Title = "Logs";
+
+}
+
+<div>
+    <h1>Upload raw libre reading</h1>
+    <p>
+        
+    </p>
+
+   @using (Html.BeginForm("CreateRequestAsync", "Api", FormMethod.Post))
+{
+    <table>
+    <tr>
+        <td><label for="accesstoken">Accesstoken:</label> </td>
+        <td><input type="text" id="accesstoken" name="accesstoken" size="40"/></td>
+
+
+    </tr>
+    <tr>
+        <td><label for="b64contents">Full patch contents ( base64 encoded):</label> </td>
+        <td><textarea name="b64contents" id="b64contents" rows="20" cols="100"></textarea></td>
+         
+        
+    </tr>
+    <tr>
+           <td>Current BG:</td>
+           <td id="currentbg" class="notavailable">NOT_AVAILABLE</td> 
+
+    </tr>
+    </table>
+
+
+
+
+    
+
+    <input type="submit" value="Submit raw reading for processing" />
+}
+
+</div>
+
+<h3>Log:</h3>
+<div>
+    <textarea rows="5" cols="50" readonly="readonly" id="log"></textarea>
+
+
+</div>
+
+@section Scripts {
+    <script>
+var $frm = $('form'),
+    $log = $('#log'),
+    $token =$("#accesstoken"),
+    $currentbg = $("#currentbg");
+    
+
+var statusurl = "@Url.Action("GetStatus", "Api")";
+
+function precisionRound(number, precision) {
+  var factor = Math.pow(10, precision);
+  return Math.round(number * factor) / factor;
+}
+    
+function timestring2Date(astr) {
+    return new Date(parseInt(astr.replace (/[^\d.]/g, '' ), 10));
+}
+
+
+function getStatus(uuid){
+    
+    $.ajax({
+        type: "POST",
+        url: statusurl,
+        data: $.param({accesstoken: $token.val(), uuid: uuid}),
+        success: function (data) {
+
+            if(data.Error){
+                loghelper("Error: " + data.Message);
+            } else if(data.Result){
+                updateLog(data.Result);
+
+            }
+        },
+        error: function (data) {
+            loghelper("There was a problem, check the console!");
+            console.log("Problem:");
+            console.log(data);
+        },
+    });
+}
+
+   
+function updateLog(res){
+    
+    var updatedAt =  timestring2Date(res.ModifiedOn);
+    var result = res.result;
+    var uuid = res.uuid;
+
+    if (result) {
+        loghelper("BG generated at " + updatedAt + ": " + result + " mgdl");
+        try{
+            console.log("result:" + result);
+          var matches = result.match(/currentbg: (\d+)/i);
+          var mgdl = parseInt(matches[1], 10);
+          var mmol = precisionRound(mgdl / 18, 1);
+
+          $currentbg.removeClass("notavailable").addClass("available")
+          .html(mgdl + " mgdl / " + mmol + " mmol" );
+        } catch(err){}
+    }
+
+
+    if (result === null && uuid ) {
+        loghelper("Got uuid " + uuid + ", setting  timer to check status in 5 seconds");
+        clearTimers();
+        setupTimer(uuid);
+    }
+
+}  
+var timers = [];
+
+function clearTimers() {
+  for(var timer in timers) {
+    if(timers.hasOwnProperty(timer)){
+     window.clearInterval(timer);
+    }
+  }
+  timers = [];
+}
+
+function setupTimer(uuid) {
+
+    
+    timers.push(window.setTimeout(function(){
+        console.log("interval reached, uuid:" + uuid);
+        getStatus(uuid);
+    }, 5000));
+}
+    
+function loghelper(msg){
+  var now = new Date().toLocaleTimeString();
+  $log.val($log.val() + "\n[" + now + "] " + msg)
+  .scrollTop($log[0].scrollHeight);
+}
+
+$frm.submit(function (e) {
+
+    e.preventDefault();
+
+    loghelper("Submitting");
+    $.ajax({
+        type: $frm.attr('method'),
+        url: $frm.attr('action'),
+        data: $frm.serialize(),
+        success: function (data) {
+            if(data.Error){
+                alert("There was a problem with your request: " + data.Message);
+            } else if(data.Result){
+                updateLog(data.Result);
+            }
+        },
+        error: function (data) {
+            loghelper("There was a problem, check the console!");
+            console.log("Problem:");
+            console.log(data);
+        },
+    });
+});
+    </script>
+}
