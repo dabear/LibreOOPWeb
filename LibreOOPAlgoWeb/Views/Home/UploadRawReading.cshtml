@@ -1,7 +1,5 @@
-﻿
+﻿@{
 
-@{
-    
     ViewBag.Title = "Logs";
 
 }
@@ -9,46 +7,32 @@
 <div>
     <h1>Upload raw libre reading</h1>
     <p>
-        
     </p>
 
-   @using (Html.BeginForm("CreateRequestAsync", "Api", FormMethod.Post))
-{
-    <table>
-    <tr>
-        <td><label for="accesstoken">Accesstoken:</label> </td>
-        <td><input type="text" id="accesstoken" name="accesstoken" size="40"/></td>
+    @using (Html.BeginForm("CreateRequestAsync", "Api", FormMethod.Post))
+    {
+        <table>
+            <tr>
+                <td><label for="accesstoken">Accesstoken:</label> </td>
+                <td><input type="text" id="accesstoken" name="accesstoken" size="40" /></td>
+            </tr>
+            <tr>
+                <td><label for="b64contents">Full patch contents ( base64 encoded):</label> </td>
+                <td><textarea name="b64contents" id="b64contents" rows="20" cols="100"></textarea></td>
+            </tr>
+            <tr>
+                <td>Current BG:</td>
+                <td id="currentbg" class="notavailable">NOT_AVAILABLE</td>
+            </tr>
+        </table>
 
-
-    </tr>
-    <tr>
-        <td><label for="b64contents">Full patch contents ( base64 encoded):</label> </td>
-        <td><textarea name="b64contents" id="b64contents" rows="20" cols="100"></textarea></td>
-         
-        
-    </tr>
-    <tr>
-           <td>Current BG:</td>
-           <td id="currentbg" class="notavailable">NOT_AVAILABLE</td> 
-
-    </tr>
-    </table>
-
-
-
-
-    
-
-    <input type="submit" value="Submit raw reading for processing" />
-}
-
+        <input type="submit" value="Submit raw reading for processing" />
+    }
 </div>
 
 <h3>Log:</h3>
 <div>
     <textarea rows="5" cols="50" readonly="readonly" id="log"></textarea>
-
-
 </div>
 
 @section Scripts {
@@ -57,7 +41,6 @@ var $frm = $('form'),
     $log = $('#log'),
     $token =$("#accesstoken"),
     $currentbg = $("#currentbg");
-    
 
 var statusurl = "@Url.Action("GetStatus", "Api")";
 
@@ -65,14 +48,13 @@ function precisionRound(number, precision) {
   var factor = Math.pow(10, precision);
   return Math.round(number * factor) / factor;
 }
-    
+
 function timestring2Date(astr) {
     return new Date(parseInt(astr.replace (/[^\d.]/g, '' ), 10));
 }
 
-
 function getStatus(uuid){
-    
+
     $.ajax({
         type: "POST",
         url: statusurl,
@@ -94,9 +76,8 @@ function getStatus(uuid){
     });
 }
 
-   
 function updateLog(res){
-    
+
     var updatedAt =  timestring2Date(res.ModifiedOn);
     var result = res.result;
     var uuid = res.uuid;
@@ -105,15 +86,17 @@ function updateLog(res){
         loghelper("BG generated at " + updatedAt + ": " + result + " mgdl");
         try{
             console.log("result:" + result);
-          var matches = result.match(/currentbg: (\d+)/i);
+            var matches = result.match(/currentbg: (-?\d+)/i)
           var mgdl = parseInt(matches[1], 10);
           var mmol = precisionRound(mgdl / 18, 1);
-
+          var extra = "";
+          if (mgdl <= 0) {
+              extra = " ( INVALID??) ";
+          }
           $currentbg.removeClass("notavailable").addClass("available")
-          .html(mgdl + " mgdl / " + mmol + " mmol" );
+          .html(mgdl + " mgdl / " + mmol + " mmol " + extra);
         } catch(err){}
     }
-
 
     if (result === null && uuid ) {
         loghelper("Got uuid " + uuid + ", setting  timer to check status in 5 seconds");
@@ -121,7 +104,7 @@ function updateLog(res){
         setupTimer(uuid);
     }
 
-}  
+}
 var timers = [];
 
 function clearTimers() {
@@ -135,13 +118,12 @@ function clearTimers() {
 
 function setupTimer(uuid) {
 
-    
     timers.push(window.setTimeout(function(){
         console.log("interval reached, uuid:" + uuid);
         getStatus(uuid);
     }, 5000));
 }
-    
+
 function loghelper(msg){
   var now = new Date().toLocaleTimeString();
   $log.val($log.val() + "\n[" + now + "] " + msg)
