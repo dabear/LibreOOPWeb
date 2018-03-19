@@ -93,7 +93,7 @@ function updateLog(res){
           if (mgdl <= 0) {
               extra = " ( INVALID??) ";
           }
-          $currentbg.removeClass("notavailable").addClass("available")
+          $currentbg.removeClass("notavailable available").addClass(mgdl <= 0 ? "notavailable" : "available")
           .html(mgdl + " mgdl / " + mmol + " mmol " + extra);
         } catch(err){}
     }
