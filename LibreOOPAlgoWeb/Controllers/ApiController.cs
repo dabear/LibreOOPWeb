@@ -128,11 +128,18 @@ namespace LibreOOPWeb.Controllers
             try
             {
                 readings = await MongoConnection.GetPendingReadingsForProcessing();
-
             }
             catch (Exception ex)
             {
                 return Error("FetchPendingRequests Failed: " + ex.Message);
+            }
+
+            try
+            {
+                await MongoConnection.UpdatePingCollection();
+            }
+            catch (Exception)
+            {
             }
 
             return Success<List<LibreReadingModel>>(readings, "FetchPendingRequests");
@@ -200,7 +207,7 @@ params:
             //the minutes parameter is often 1440 (24 hours), telling you how long back you should do the search
             //In nightscout context it is mostly redundant as the maxCount will search as long back as needed.
             //we ignore that parameter
-            Logger.LogInfo("Accesing Glucose Index");
+            //Logger.LogInfo("Accesing Glucose Index");
 
 
            

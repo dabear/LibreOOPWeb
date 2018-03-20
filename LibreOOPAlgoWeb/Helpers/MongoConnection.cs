@@ -14,22 +14,29 @@ namespace LibreOOPWeb.Helpers
     public class MongoConnection
     {
         public static string uri = Config.MongoUrl;
-        public static IMongoCollection<LibreReadingModel> GetCollection() {
+        public static IMongoCollection<LibreReadingModel> GetReadingsCollection() {
             var client = new MongoClient(uri);
             var db = client.GetDatabase("bjorninge_libreoopweb");
             return db.GetCollection<LibreReadingModel>("librereadings");
         }
-      
+
+        public static IMongoCollection<PingModel> GetPingCollection()
+        {
+            var client = new MongoClient(uri);
+            var db = client.GetDatabase("bjorninge_libreoopweb");
+            return db.GetCollection<PingModel>("libreping");
+        }
+
         public async static Task AsyncInsertReading(LibreReadingModel reading){
 
-            await GetCollection().InsertOneAsync(reading);
+            await GetReadingsCollection().InsertOneAsync(reading);
         }
 
         public async static Task<LibreReadingModel> GetRemoteReading(string uuid)
         {
  
 
-            var collection = GetCollection();
+            var collection = GetReadingsCollection();
 
             var filter = Builders<LibreReadingModel>.Filter.Eq("uuid", uuid);
 
@@ -40,7 +47,7 @@ namespace LibreOOPWeb.Helpers
         public async static Task<List<LibreReadingModel>> GetPendingReadingsForProcessing()
         {
 
-            var collection = GetCollection();
+            var collection = GetReadingsCollection();
 
             var filter = Builders<LibreReadingModel>.Filter.Eq("status", "pending");
 
@@ -55,11 +62,33 @@ namespace LibreOOPWeb.Helpers
             return pending;
         }
 
+        public async static Task<bool> UpdatePingCollection()
+        {
+            var collection = GetPingCollection();
+            var now = DateTime.Now;
+            var updateFilter = Builders<PingModel>.Filter.Eq("Desc", "lastfetch");
+            var update = Builders<PingModel>.Update
+                                            .Set("ModifiedOn", now);
+            
+            var res = await collection.UpdateOneAsync(updateFilter, update);
+
+            //insert new reading if there was no reading to update
+            if(res.ModifiedCount == 0)
+            {
+                await collection.InsertOneAsync(new PingModel {
+                    Desc = "lastfetch",
+                    ModifiedOn = now
+                });
+            }
+
+            return false;
+        }
+
         public async static Task<bool> AsyncUpdateReading(LibreReadingModel reading)
         {
            
 
-            var collection = GetCollection();
+            var collection = GetReadingsCollection();
 
             var updateFilter = Builders<LibreReadingModel>.Filter.Eq("uuid", reading.uuid);
             var update = Builders<LibreReadingModel>.Update.Set("result", reading.result)
