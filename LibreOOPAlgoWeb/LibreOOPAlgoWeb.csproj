@@ -172,6 +172,7 @@
     <Compile Include="Helpers\MongoConnection.cs" />
     <Compile Include="Models\NightscoutPermissionsModel.cs" />
     <Compile Include="Models\LibreReadingModel.cs" />
+    <Compile Include="Models\UptimeModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\loop-source-change-url.png" />

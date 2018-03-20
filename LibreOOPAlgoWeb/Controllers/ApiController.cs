@@ -92,6 +92,26 @@ namespace LibreOOPWeb.Controllers
             //return Content("CreateRequestAsync IS NOT IMPLEMENTED YET:" + content);    
         }
 
+        public async Task<ActionResult> Uptime() {
+            //this is an unprivileged operation
+            var uptime = await MongoConnection.GetLatestPing();
+
+            var now = DateTime.Now;
+            string diff = "na";
+           
+            if (uptime != null){
+                diff = Math.Round((now - uptime).Value.TotalSeconds,0).ToString();
+
+            }
+
+            return Success<UptimeModel>(new UptimeModel{ 
+                LastPingSecondsAgo = diff,
+                LastPing = uptime,
+                Now = now
+            }, "Uptime");
+
+        }
+
         public async Task<ActionResult> GetStatus(string accesstoken, string uuid) {
 
             if (!await this.checkUploadPermissions(accesstoken))

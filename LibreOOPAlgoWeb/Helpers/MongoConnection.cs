@@ -62,6 +62,15 @@ namespace LibreOOPWeb.Helpers
             return pending;
         }
 
+        public async static Task<DateTime?> GetLatestPing(){
+            var collection = GetPingCollection();
+            var filter = Builders<PingModel>.Filter.Eq("Desc", "lastfetch");
+
+
+            return (await collection.FindAsync(filter).Result.FirstAsync())?.ModifiedOn;
+
+        }
+
         public async static Task<bool> UpdatePingCollection()
         {
             var collection = GetPingCollection();
