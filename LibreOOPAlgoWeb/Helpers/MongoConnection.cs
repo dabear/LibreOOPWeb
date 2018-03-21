@@ -66,8 +66,14 @@ namespace LibreOOPWeb.Helpers
             var collection = GetPingCollection();
             var filter = Builders<PingModel>.Filter.Eq("Desc", "lastfetch");
 
+            try
+            {
+                return (await collection.FindAsync(filter).Result.FirstAsync()).ModifiedOn;
+            }
+            catch (InvalidOperationException) {
+            }
 
-            return (await collection.FindAsync(filter).Result.FirstAsync())?.ModifiedOn;
+            return null;
 
         }
 

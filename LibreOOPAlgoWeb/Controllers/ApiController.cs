@@ -97,10 +97,10 @@ namespace LibreOOPWeb.Controllers
             var uptime = await MongoConnection.GetLatestPing();
 
             var now = DateTime.Now;
-            string diff = "na";
+            int diff = -1;
            
             if (uptime != null){
-                diff = Math.Round((now - uptime).Value.TotalSeconds,0).ToString();
+                diff = Convert.ToInt32((now - uptime).Value.TotalSeconds);
 
             }
 

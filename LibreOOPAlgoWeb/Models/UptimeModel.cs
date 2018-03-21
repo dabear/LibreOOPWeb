@@ -18,7 +18,7 @@ namespace LibreOOPWeb.Models
         public DateTime? LastPing { get; set; }
         [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
         public DateTime Now { get; set; }
-        public string LastPingSecondsAgo { get; set; }
+        public int LastPingSecondsAgo { get; set; }
 
 
     }
