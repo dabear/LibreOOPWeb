@@ -3,7 +3,12 @@
     ViewBag.Title = "Logs";
 
 }
-
+@if (ViewBag.shouldNotify)
+{
+<div id="note">
+    <strong>Please note!</strong >The processing agent hasn't been online for @ViewBag.secondsOff seconds
+</div>
+}
 <div>
     <h1>Upload raw libre reading</h1>
     <p>
