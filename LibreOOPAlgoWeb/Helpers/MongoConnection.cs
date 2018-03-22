@@ -14,16 +14,21 @@ namespace LibreOOPWeb.Helpers
     public class MongoConnection
     {
         public static string uri = Config.MongoUrl;
+        private static readonly Lazy<MongoClient> lazymongoclient =
+            new Lazy<MongoClient>(() => new MongoClient(uri));
+
+        public static MongoClient mongoClient => lazymongoclient.Value;
+        
         public static IMongoCollection<LibreReadingModel> GetReadingsCollection() {
-            var client = new MongoClient(uri);
-            var db = client.GetDatabase("bjorninge_libreoopweb");
+            
+            var db = mongoClient.GetDatabase("bjorninge_libreoopweb");
             return db.GetCollection<LibreReadingModel>("librereadings");
         }
 
         public static IMongoCollection<PingModel> GetPingCollection()
         {
-            var client = new MongoClient(uri);
-            var db = client.GetDatabase("bjorninge_libreoopweb");
+            
+            var db = mongoClient.GetDatabase("bjorninge_libreoopweb");
             return db.GetCollection<PingModel>("libreping");
         }
 
