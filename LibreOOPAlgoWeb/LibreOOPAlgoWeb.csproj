@@ -173,6 +173,7 @@
     <Compile Include="Models\NightscoutPermissionsModel.cs" />
     <Compile Include="Models\LibreReadingModel.cs" />
     <Compile Include="Models\UptimeModel.cs" />
+    <Compile Include="Helpers\LibreTestData.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\loop-source-change-url.png" />
@@ -266,6 +267,8 @@
     <Content Include="Scripts\respond.matchmedia.addListener.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Views\Home\UploadRawReading.cshtml" />
+    <Content Include="Content\jquery.powertip.min.css" />
+    <Content Include="Content\jquery.powertip.min.js" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

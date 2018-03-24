@@ -1,4 +1,5 @@
-﻿@{
+﻿@using LibreOOPWeb.Helpers;
+@{
 
     ViewBag.Title = "Logs";
 
@@ -42,10 +43,13 @@
 
 @section Scripts {
     <script>
+var testdata = "@LibreTestData.TestDataReturns63";
+    
 var $frm = $('form'),
     $log = $('#log'),
     $token =$("#accesstoken"),
-    $currentbg = $("#currentbg");
+    $currentbg = $("#currentbg"),
+    $b64contents = $("#b64contents");
 
 var statusurl = "@Url.Action("GetStatus", "Api")";
 
@@ -158,5 +162,23 @@ $frm.submit(function (e) {
         },
     });
 });
+
+// popup for example data
+
+var tipContent = $(
+    "<p><strong>Don't know what to write here?</strong></p>" +
+    '<p><button class="inserttestdata">Insert Testdata</button> or<a href="https://www.base64decode.org/"> click here</a></p>' +
+    '<p><a href="https://www.base64decode.org/">to learn how to encode your data to b64</a></p>'
+);
+$b64contents.data('powertipjq', tipContent);
+$b64contents.powerTip({
+    placement: 'e',
+    mouseOnToPopup: true
+});
+    
+$("body").on("click", "button.inserttestdata", function(){
+    $b64contents.val(testdata);
+});
+    
     </script>
 }
