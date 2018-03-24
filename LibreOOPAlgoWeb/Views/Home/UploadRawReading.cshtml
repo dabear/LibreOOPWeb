@@ -175,10 +175,14 @@ $b64contents.powerTip({
     placement: 'e',
     mouseOnToPopup: true
 });
+
     
-$("body").on("click", "button.inserttestdata", function(){
+$(document.body).on("mousedown", "button.inserttestdata",function(e){
     $b64contents.val(testdata);
+    console.log("b64contents to be filled");
+    e.preventDefault();
 });
-    
+
+
     </script>
 }
