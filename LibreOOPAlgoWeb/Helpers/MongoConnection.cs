@@ -14,10 +14,10 @@ namespace LibreOOPWeb.Helpers
     public class MongoConnection
     {
         public static string uri = Config.MongoUrl;
-        private static readonly Lazy<MongoClient> lazymongoclient =
+        private static readonly Lazy<MongoClient> lazyMongoClient =
             new Lazy<MongoClient>(() => new MongoClient(uri));
 
-        public static MongoClient mongoClient => lazymongoclient.Value;
+        public static MongoClient mongoClient => lazyMongoClient.Value;
         
         public static IMongoCollection<LibreReadingModel> GetReadingsCollection() {
             
@@ -47,6 +47,14 @@ namespace LibreOOPWeb.Helpers
 
 
             return await collection.FindAsync(filter).Result.FirstAsync();
+        }
+
+        public async static Task<bool> DeleteTestReadings(){
+            var collection = GetReadingsCollection();
+            var filter = Builders<LibreReadingModel>.Filter.Eq("b64contents", LibreTestData.TestDataReturns63);
+
+            await collection.DeleteManyAsync(filter);
+            return true;
         }
 
         public async static Task<List<LibreReadingModel>> GetPendingReadingsForProcessing()

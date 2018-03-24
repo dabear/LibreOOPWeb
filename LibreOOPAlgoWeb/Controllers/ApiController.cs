@@ -47,7 +47,22 @@ namespace LibreOOPWeb.Controllers
                 },
                 JsonRequestBehavior.AllowGet);
         } 
+        public async Task<ActionResult> DeleteTestReadings(string processing_accesstoken){
+            if (!await this.checkProcessingPermissions(processing_accesstoken))
+            {
+                return this.Error("DeleteTestReadings Denied");
+            }
 
+            try
+            {
+                await MongoConnection.DeleteTestReadings();
+            } catch(Exception ex) {
+                return this.Error("DeleteTestReadings Failed: " + ex.Message);
+            }
+
+            return Success<string>("test readings deleted", "DeleteTestReadings");
+
+        }
         public async Task<ActionResult> CreateRequestAsync(string accesstoken, string b64contents){
 
             //var permissions= await NightscoutPermissions.CheckUploadPermissions(accesstoken);
@@ -94,7 +109,7 @@ namespace LibreOOPWeb.Controllers
 
         public async Task<ActionResult> Uptime() {
             //this is an unprivileged operation
-            var uptime = await MongoConnection.GetLatestPing();
+                var uptime = await MongoConnection.GetLatestPing();
 
             var now = DateTime.Now;
             int diff = -1;

@@ -1,0 +1,8 @@
+﻿using System;
+namespace LibreOOPWeb.Helpers
+{
+    public class LibreTestData
+    {
+        public static string TestDataReturns63 = "Os8QFgMAAAAAAAAAAAAAAAAAAAAAAAAATxEIEK0CyNRbAKoCyLQbgKkCyJxbAKkCyIwbgLACyDBcgLACiOacgLgCyDydgLgCyGCdgKECyNyegKsCyBSegKkCyMCdgKsCyHidgKoCyECdgKgCyAidgKgCyCxcgK0CyPhbACkGyPSbgMkFyIzegMMFyCiegCwGyNCegHsGiKaegPkFyLCegJkFyPCegC4FyACfgIEEyEiggF0EyDidgBIEyBCegM8DyEyegG8DyLiegBkDyECfgMUCyPSegKoCyPhbAKIEyDiaANEEyCibgOQEyOAagI8EyCCbgCIGyFBbgLwGyFScgH8FyCRcgMkFyDhcgDgFyPQagDcHyIRbgPsIyEycgPsJyHybgHcKyORagN8JyIifgG0IyCyfgMMGyLCdgNkRAABywgAIggUJURQHloBaAO2mDm4ayATdWG0=";
+    }
+}
