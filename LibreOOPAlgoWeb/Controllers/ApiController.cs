@@ -107,7 +107,7 @@ namespace LibreOOPWeb.Controllers
             //return Content("CreateRequestAsync IS NOT IMPLEMENTED YET:" + content);    
         }
 
-        public async Task<ActionResult> Uptime() {
+        public async Task<ActionResult> Uptime(string upordown) {
             //this is an unprivileged operation
                 var uptime = await MongoConnection.GetLatestPing();
 
@@ -118,7 +118,9 @@ namespace LibreOOPWeb.Controllers
                 diff = Convert.ToInt32((now - uptime).Value.TotalSeconds);
 
             }
-
+            if (upordown == "keyword") {
+                return Content( (diff < 0 || diff > 60) ? "down" : "up");
+            }
             return Success<UptimeModel>(new UptimeModel{ 
                 LastPingSecondsAgo = diff,
                 LastPing = uptime,
