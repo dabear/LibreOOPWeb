@@ -63,7 +63,7 @@ namespace LibreOOPWeb.Controllers
             return Success<string>("test readings deleted", "DeleteTestReadings");
 
         }
-        public async Task<ActionResult> CreateRequestAsync(string accesstoken, string b64contents){
+        public async Task<ActionResult> CreateRequestAsync(string accesstoken, string b64contents, string oldState){
 
             //var permissions= await NightscoutPermissions.CheckUploadPermissions(accesstoken);
             //var permissions = await NightscoutPermissions.CheckProcessPermissions(accesstoken);
@@ -83,6 +83,16 @@ namespace LibreOOPWeb.Controllers
                 return this.Error("CreateRequestAsync Denied: invalid parameter b64contents: (not a b64string)");
             }
 
+            //oldstate is optional, only check it's content if it's present
+            if(!string.IsNullOrWhiteSpace(oldState)) {
+                try{
+                    // database expects a base64, which we already have
+                    // this is just to verify that the contents is valid as base64
+                    System.Convert.FromBase64String(oldState);
+                } catch(FormatException){
+                    return this.Error("CreateRequestAsync Denied: invalid optional parameter oldState: (not a b64string)");
+                }
+            }
 
             var g = Guid.NewGuid().ToString();
             var reading = new LibreReadingModel
@@ -91,7 +101,10 @@ namespace LibreOOPWeb.Controllers
                 ModifiedOn = DateTime.Now,
                 status = "pending",
                 b64contents = b64contents,
-                uuid = g
+                uuid = g,
+                oldState = oldState,
+                newState = null //gets updated by the algo
+
             };
 
             try{

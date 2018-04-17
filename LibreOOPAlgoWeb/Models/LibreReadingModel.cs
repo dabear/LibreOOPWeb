@@ -27,5 +27,7 @@ namespace LibreOOPWeb.Models
         public string b64contents { get; set; }
         public string status { get; set; }
         public string result { get; set; }
+        public string oldState { get; set; }
+        public string newState { get; set; }
     }
 }
