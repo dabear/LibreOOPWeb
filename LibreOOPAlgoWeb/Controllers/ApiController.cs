@@ -63,7 +63,7 @@ namespace LibreOOPWeb.Controllers
             return Success<string>("test readings deleted", "DeleteTestReadings");
 
         }
-        public async Task<ActionResult> CreateRequestAsync(string accesstoken, string b64contents, string oldState){
+        public async Task<ActionResult> CreateRequestAsync(string accesstoken, string b64contents, string oldState, string sensorStartTimestamp, string sensorScanTimestamp, string currentUtcOffset){
 
             //var permissions= await NightscoutPermissions.CheckUploadPermissions(accesstoken);
             //var permissions = await NightscoutPermissions.CheckProcessPermissions(accesstoken);
@@ -72,26 +72,55 @@ namespace LibreOOPWeb.Controllers
                 return this.Error("CreateRequestAsync Denied");
             }
 
+
             if(string.IsNullOrWhiteSpace(b64contents)) {
                 return this.Error("CreateRequestAsync Denied: invalid parameter b64contents");
             }
             try{
-                //database expects a base64, which we already have
+                // Database expects a base64, which we already have
                 // this is just to verify that the contents is valid as base64
                 System.Convert.FromBase64String(b64contents);
             } catch(FormatException){
                 return this.Error("CreateRequestAsync Denied: invalid parameter b64contents: (not a b64string)");
             }
 
-            //oldstate is optional, only check it's content if it's present
-            if(!string.IsNullOrWhiteSpace(oldState)) {
-                try{
-                    // database expects a base64, which we already have
+            if (string.IsNullOrWhiteSpace(oldState + sensorStartTimestamp + sensorScanTimestamp + currentUtcOffset))
+            {
+                //these advanced parameters are optional, and this is ok
+
+            }
+            else if (oldState?.Length > 0 && sensorStartTimestamp?.Length > 0 && sensorScanTimestamp?.Length > 0 && currentUtcOffset?.Length > 0)
+            {
+                try
+                {
+                    //database expects a base64, which we already have
                     // this is just to verify that the contents is valid as base64
                     System.Convert.FromBase64String(oldState);
-                } catch(FormatException){
-                    return this.Error("CreateRequestAsync Denied: invalid optional parameter oldState: (not a b64string)");
                 }
+                catch (FormatException)
+                {
+                    return this.Error("CreateRequestAsync Denied: invalid parameter oldState: (not a b64string)");
+                }
+
+                if (!Int64.TryParse(sensorStartTimestamp, out _))
+                {
+                    return this.Error("CreateRequestAsync Denied: invalid parameter sensorStartTimestamp: (not a long)");
+                }
+
+                if (!Int64.TryParse(sensorScanTimestamp, out _))
+                {
+                    return this.Error("CreateRequestAsync Denied: invalid parameter sensorScanTimestamp: (not a long)");
+                }
+
+                if (!Int64.TryParse(currentUtcOffset, out _))
+                {
+                    return this.Error("CreateRequestAsync Denied: invalid parameter currentUtcOffset: (not a long)");
+                }
+
+            }
+            else
+            {
+                return this.Error("CreateRequestAsync Denied: when speciying advanced parameters, all advanced parameters should be specified (oldState, sensorStartTimestamp, sensorScanTimestamp, currentUtcOffset)");
             }
 
             var g = Guid.NewGuid().ToString();
@@ -103,9 +132,13 @@ namespace LibreOOPWeb.Controllers
                 b64contents = b64contents,
                 uuid = g,
                 oldState = oldState,
+                currentUtcOffset = currentUtcOffset,
+                sensorStartTimestamp = sensorStartTimestamp,
+                sensorScanTimestamp = sensorScanTimestamp,
                 newState = null //gets updated by the algo
 
             };
+
 
             try{
                 await MongoConnection.AsyncInsertReading(reading);
