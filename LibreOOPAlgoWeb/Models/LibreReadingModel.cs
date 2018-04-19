@@ -29,8 +29,8 @@ namespace LibreOOPWeb.Models
         public string result { get; set; }
         public string oldState { get; set; }
         public string newState { get; set; }
-        public string sensorStartTimestamp { get; set; }
-        public string sensorScanTimestamp { get; set; }
-        public string currentUtcOffset { get; set; }
+        public long? sensorStartTimestamp { get; set; }
+        public long? sensorScanTimestamp { get; set; }
+        public long? currentUtcOffset { get; set; }
     }
 }

@@ -71,6 +71,9 @@ namespace LibreOOPWeb.Controllers
             {
                 return this.Error("CreateRequestAsync Denied");
             }
+            long? longSensorStartTimestamp = null;
+            long? longSensorScanTimestamp = null;
+            long? longCurrentUtcOffset = null;
 
 
             if(string.IsNullOrWhiteSpace(b64contents)) {
@@ -101,18 +104,21 @@ namespace LibreOOPWeb.Controllers
                 {
                     return this.Error("CreateRequestAsync Denied: invalid parameter oldState: (not a b64string)");
                 }
+                longSensorStartTimestamp = Int64.TryParse(sensorStartTimestamp, out  var t1) ? t1 : (long?)null;
+                longSensorScanTimestamp = Int64.TryParse(sensorScanTimestamp, out var t2) ? t2 : (long?)null;
+                longCurrentUtcOffset = Int64.TryParse(currentUtcOffset, out var t3) ? t3 : (long?)null;
 
-                if (!Int64.TryParse(sensorStartTimestamp, out _))
+                if (longSensorStartTimestamp == null)
                 {
                     return this.Error("CreateRequestAsync Denied: invalid parameter sensorStartTimestamp: (not a long)");
                 }
 
-                if (!Int64.TryParse(sensorScanTimestamp, out _))
+                if (longSensorScanTimestamp == null)
                 {
                     return this.Error("CreateRequestAsync Denied: invalid parameter sensorScanTimestamp: (not a long)");
                 }
 
-                if (!Int64.TryParse(currentUtcOffset, out _))
+                if (longCurrentUtcOffset == null)
                 {
                     return this.Error("CreateRequestAsync Denied: invalid parameter currentUtcOffset: (not a long)");
                 }
@@ -132,14 +138,14 @@ namespace LibreOOPWeb.Controllers
                 b64contents = b64contents,
                 uuid = g,
                 oldState = oldState,
-                currentUtcOffset = currentUtcOffset,
-                sensorStartTimestamp = sensorStartTimestamp,
-                sensorScanTimestamp = sensorScanTimestamp,
+                currentUtcOffset = longCurrentUtcOffset,
+                sensorStartTimestamp = longSensorStartTimestamp,
+                sensorScanTimestamp = longSensorScanTimestamp,
                 newState = null //gets updated by the algo
 
             };
 
-
+            //return this.Error("synthax ok");
             try{
                 await MongoConnection.AsyncInsertReading(reading);
 
