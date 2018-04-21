@@ -120,7 +120,9 @@ namespace LibreOOPWeb.Helpers
 
             var updateFilter = Builders<LibreReadingModel>.Filter.Eq("uuid", reading.uuid);
             var update = Builders<LibreReadingModel>.Update.Set("result", reading.result)
-                                                      .Set("status", reading.status).Set("ModifiedOn", reading.ModifiedOn);
+                                                    .Set("status", reading.status)
+                                                    .Set("ModifiedOn", reading.ModifiedOn)
+                                                    .Set("newState", reading.newState ?? "n/a");
 
 
 

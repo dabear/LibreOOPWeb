@@ -236,7 +236,7 @@ namespace LibreOOPWeb.Controllers
             //return Content(System.Reflection.MethodBase.GetCurrentMethod().Name + " IS NOT IMPLEMENTED YET:" + content);
         }
 
-        public async Task<ActionResult> UploadResults(string processing_accesstoken, string uuid, string result){
+        public async Task<ActionResult> UploadResults(string processing_accesstoken, string uuid, string result, string newState){
             if (!await this.checkProcessingPermissions(processing_accesstoken))
             {
                 return this.Error("UploadResults Denied");
@@ -260,7 +260,10 @@ namespace LibreOOPWeb.Controllers
                     ModifiedOn = DateTime.Now,
                     status = "complete",
                     uuid = uuid,
-                    result = result
+                    result = result,
+                    newState = newState
+
+
                 };
 
                 wasSuccessfullyModified = await MongoConnection.AsyncUpdateReading(reading);
