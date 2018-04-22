@@ -30,8 +30,37 @@
                 <td>Current BG:</td>
                 <td id="currentbg" class="notavailable">NOT_AVAILABLE</td>
             </tr>
+            <tr>
+                <td>Generated newState</td>
+                <td id="newState" class="notavailable">NOT_AVAILABLE</td>
+            </tr>
         </table>
 
+        <h3 id="showhideadvanced">Advanced options (can be blank)</h3>
+        <table id="tableadvanced">
+            <tr>
+                <td><label for="oldState">oldstate ( base64 encoded):</label></td>
+                <td><input type="text" name="oldState" id="oldState" size="60" /></td>
+
+            </tr>
+             <tr>
+                <td><label for="sensorStartTimestamp">sensorStartTimestamp:</label></td>
+                <td><input type="text" name="sensorStartTimestamp" id="sensorStartTimestamp" size="40" /></td>
+
+            </tr>
+            <tr>
+                <td><label for="sensorScanTimestamp">sensorScanTimestamp:</label></td>
+                <td><input type="text" name="sensorScanTimestamp" id="sensorScanTimestamp" size="40" /></td>
+
+            </tr>
+            <tr>
+                <td><label for="currentUtcOffset">currentUtcOffset:</label></td>
+                <td><input type="text" name="currentUtcOffset" id="currentUtcOffset" size="40" /></td>
+
+            </tr>
+        
+        </table>
+       
         <input type="submit" value="Submit raw reading for processing" />
     }
 </div>
@@ -44,12 +73,20 @@
 @section Scripts {
     <script>
 var testdata = "@LibreTestData.TestDataReturns63";
+var testdataStartTime = @LibreTestData.TestDataReturns63SensorStartTimestamp;
+var testdataScanTime = @LibreTestData.TestDataReturns63SensorScanTimestamp;
+var testdataOffset = @LibreTestData.TestDataReturns63CurrentUtcOffset;
     
 var $frm = $('form'),
     $log = $('#log'),
     $token =$("#accesstoken"),
     $currentbg = $("#currentbg"),
-    $b64contents = $("#b64contents");
+    $b64contents = $("#b64contents"),
+    $oldState = $("#oldState"),
+    $start = $("#sensorStartTimestamp"),
+    $scan = $("#sensorScanTimestamp"),
+    $offset = $("#currentUtcOffset")
+    $newState = $("#newState");
 
 var statusurl = "@Url.Action("GetStatus", "Api")";
 
@@ -90,6 +127,7 @@ function updateLog(res){
     var updatedAt =  timestring2Date(res.ModifiedOn);
     var result = res.result;
     var uuid = res.uuid;
+    var newState = res.newState;
 
     if (result) {
         loghelper("BG generated at " + updatedAt + ": " + result + " mgdl");
@@ -104,6 +142,12 @@ function updateLog(res){
           }
           $currentbg.removeClass("notavailable available").addClass(mgdl <= 0 ? "notavailable" : "available")
           .html(mgdl + " mgdl / " + mmol + " mmol " + extra);
+
+          $newState.removeClass("notavailable available")
+            .addClass(newState && newState.length >0 ?  "available" : "notavailable" )
+            .html(newState && newState.length >0 ? newState : "");
+          console.log("got newstate:" + newState);
+    
         } catch(err){}
     }
 
@@ -165,23 +209,72 @@ $frm.submit(function (e) {
 
 // popup for example data
 
-var tipContent = $(
+
+$b64contents.data('powertipjq', $(
     "<p><strong>Don't know what to write here?</strong></p>" +
     '<p><button class="inserttestdata">Insert Testdata</button> or<a href="https://www.base64decode.org/"> click here</a></p>' +
     '<p><a href="https://www.base64decode.org/">to learn how to encode your data to b64</a></p>'
-);
-$b64contents.data('powertipjq', tipContent);
-$b64contents.powerTip({
+))
+.powerTip({
     placement: 'e',
     mouseOnToPopup: true
 });
+
+$oldState.data('powertipjq', $(
+    "<p><strong>Don't know what to write here?</strong></p>" +
+    '<p>If specified, the oldstate should be the newstate from a previous reading</p>' 
+))
+.powerTip({
+    placement: 'e',
+    mouseOnToPopup: true
+});
+
+$start.data('powertipjq', $(
+    "<p><strong>Don't know what to write here?</strong></p>" +
+    '<p><button class="insertstarttimestamp">Insert Testdata</button>' 
+))
+.powerTip({
+    placement: 'e',
+    mouseOnToPopup: true
+});
+
+$scan.data('powertipjq', $(
+    "<p><strong>Don't know what to write here?</strong></p>" +
+    '<p><button class="insertscantimestamp">Insert Testdata</button>' 
+))
+.powerTip({
+    placement: 'e',
+    mouseOnToPopup: true
+});
+
+$offset.data('powertipjq', $(
+    "<p><strong>Don't know what to write here?</strong></p>" +
+    '<p><button class="insertoffsettimestamp">Insert Testdata</button>' 
+))
+.powerTip({
+    placement: 'e',
+    mouseOnToPopup: true
+});  
+    
 
     
 $(document.body).on("mousedown", "button.inserttestdata",function(e){
     $b64contents.val(testdata);
     console.log("b64contents to be filled");
     e.preventDefault();
-});
+})
+.on("mousedown", "button.insertstarttimestamp",function(e){
+    $start.val(testdataStartTime);
+    e.preventDefault();
+})
+.on("mousedown", "button.insertscantimestamp",function(e){
+    $scan.val(testdataScanTime);
+    e.preventDefault();
+})
+.on("mousedown", "button.insertoffsettimestamp",function(e){
+    $offset.val(testdataOffset);
+    e.preventDefault();
+})
 
 
     </script>

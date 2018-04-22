@@ -137,7 +137,7 @@ namespace LibreOOPWeb.Controllers
                 status = "pending",
                 b64contents = b64contents,
                 uuid = g,
-                oldState = oldState,
+                oldState = (oldState == null || oldState == "") ? null : oldState,
                 currentUtcOffset = longCurrentUtcOffset,
                 sensorStartTimestamp = longSensorStartTimestamp,
                 sensorScanTimestamp = longSensorScanTimestamp,
