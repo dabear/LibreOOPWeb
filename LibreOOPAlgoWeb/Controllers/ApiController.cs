@@ -216,7 +216,7 @@ namespace LibreOOPWeb.Controllers
             List<LibreReadingModel> readings;
             try
             {
-                readings = await MongoConnection.GetPendingReadingsForProcessing();
+                readings = await MongoConnection.GetPendingReadingsForProcessing(Config.MaxFetchPerAttempt);
             }
             catch (Exception ex)
             {

@@ -57,14 +57,17 @@ namespace LibreOOPWeb.Helpers
             return true;
         }
 
-        public async static Task<List<LibreReadingModel>> GetPendingReadingsForProcessing()
+        public async static Task<List<LibreReadingModel>> GetPendingReadingsForProcessing(int limit)
         {
 
             var collection = GetReadingsCollection();
 
             var filter = Builders<LibreReadingModel>.Filter.Eq("status", "pending");
 
-            var pending = await collection.FindAsync(filter).Result.ToListAsync();
+            
+            var options = new FindOptions<LibreReadingModel, LibreReadingModel> { Limit = limit };
+            
+            var pending = await collection.FindAsync(filter, options).Result.ToListAsync();
 
             // Removes pending entries.
             // Next call to GetPendingReadingsForProcessing will not

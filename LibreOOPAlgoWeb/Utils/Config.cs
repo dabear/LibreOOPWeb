@@ -24,6 +24,7 @@ namespace LibreOOPWeb.Utils
 
         public static string MongoUrl => Environment.GetEnvironmentVariable("Mongo_Url");
 #endif
+        public static int MaxFetchPerAttempt = 20;  
     }
 
 }
