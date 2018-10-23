@@ -25,6 +25,13 @@ namespace LibreOOPWeb.Helpers
             return db.GetCollection<LibreReadingModel>("librereadings");
         }
 
+        public static IMongoCollection<LibreCalibrationModel> GetCalibrationCollection()
+        {
+
+            var db = mongoClient.GetDatabase("bjorninge_libreoopweb");
+            return db.GetCollection<LibreCalibrationModel>("librecalibrations");
+        }
+
         public static IMongoCollection<PingModel> GetPingCollection()
         {
             
@@ -32,9 +39,28 @@ namespace LibreOOPWeb.Helpers
             return db.GetCollection<PingModel>("libreping");
         }
 
+        public async static Task AsyncInsertCalibrationReading(LibreCalibrationModel reading)
+        {
+
+            await GetCalibrationCollection().InsertOneAsync(reading);
+        }
+
         public async static Task AsyncInsertReading(LibreReadingModel reading){
 
             await GetReadingsCollection().InsertOneAsync(reading);
+
+        }
+
+        public async static Task<LibreCalibrationModel> GetCalibration(string uuid)
+        {
+
+
+            var collection = GetCalibrationCollection();
+
+            var filter = Builders<LibreCalibrationModel>.Filter.Eq("uuid", uuid);
+
+
+            return await collection.FindAsync(filter).Result.FirstAsync();
         }
 
         public async static Task<LibreReadingModel> GetRemoteReading(string uuid)
