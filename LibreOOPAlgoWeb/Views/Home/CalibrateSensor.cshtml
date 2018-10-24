@@ -1,0 +1,171 @@
+﻿@using LibreOOPWeb.Helpers;
+@{
+
+    ViewBag.Title = "Logs";
+
+}
+@if (ViewBag.shouldNotify)
+{
+<div id="note">
+    <strong>Please note!</strong >The processing agent hasn't been online for @ViewBag.secondsOff seconds
+</div>
+}
+<div>
+    <h1>Upload raw libre reading</h1>
+    <p>
+    </p>
+
+    @using (Html.BeginForm("CreateCalibrationRequestAsync", "Api", FormMethod.Post))
+    {
+        <table>
+            <tr>
+                <td><label for="accesstoken">Accesstoken:</label> </td>
+                <td><input type="text" id="accesstoken" name="accesstoken" size="40" /></td>
+            </tr>
+            <tr>
+                <td><label for="b64contents">Full patch contents ( base64 encoded):</label> </td>
+                <td><textarea name="b64contents" id="b64contents" rows="20" cols="100"></textarea></td>
+            </tr>
+           
+        </table>
+
+       
+       
+        <input type="submit" value="Submit raw reading for processing" />
+    }
+</div>
+
+<h3>Log:</h3>
+<div>
+    <textarea rows="5" cols="50" readonly="readonly" id="log"></textarea>
+</div>
+
+@section Scripts {
+    <script>
+    var testdata = "@LibreTestData.TestDataReturns63";
+        var $frm = $('form'),
+            $log = $('#log'),
+            $token = $("#accesstoken"),
+            $b64contents = $("#b64contents");
+   
+
+var statusurl = "@Url.Action("GetCalibrationStatus", "Api")";
+
+
+function getStatus(uuid){
+
+    $.ajax({
+        type: "POST",
+        url: statusurl,
+        data: $.param({accesstoken: $token.val(), uuid: uuid}),
+        success: function (data) {
+            
+            if (data.Error) {
+                loghelper("Error: " + data.Message);
+            } else if (data.Result && data.Result.status && data.Result.status == "complete") {
+                loghelper(JSON.stringify(data.Result));
+                clearTimers();
+            } else if (data.Result && data.Result.uuid) {
+                updateLog(data.Result);
+            }
+        },
+        error: function (data) {
+            loghelper("There was a problem, check the console!");
+            console.log("Problem:");
+            console.log(data);
+        },
+    });
+}
+
+function updateLog(res){
+    console.log("hit updatelog")
+    
+
+    //var updatedAt =  timestring2Date(res.ModifiedOn);
+    var uuid = res.uuid;
+
+    if (uuid ) {
+        loghelper("Got uuid " + uuid + ", setting  timer to check status in 5 seconds");
+        clearTimers();
+        setupTimer(uuid);
+    }
+
+}
+var timers = [];
+
+function clearTimers() {
+  for(var timer in timers) {
+    if(timers.hasOwnProperty(timer)){
+     window.clearInterval(timer);
+    }
+  }
+  timers = [];
+}
+
+function timestring2Date(astr) {
+    return new Date(parseInt(astr.replace(/[^\d.]/g, ''), 10));
+        }
+
+function setupTimer(uuid) {
+
+    timers.push(window.setTimeout(function(){
+        console.log("interval reached, uuid:" + uuid);
+        getStatus(uuid);
+    }, 5000));
+}
+
+function loghelper(msg){
+  var now = new Date().toLocaleTimeString();
+  $log.val($log.val() + "\n[" + now + "] " + msg)
+  .scrollTop($log[0].scrollHeight);
+}
+
+$frm.submit(function (e) {
+
+    e.preventDefault();
+
+    loghelper("Submitting");
+    $.ajax({
+        type: $frm.attr('method'),
+        url: $frm.attr('action'),
+        data: $frm.serialize(),
+        success: function (data) {
+            if(data.Error){
+                alert("There was a problem with your request: " + data.Message);
+            } else if(data.Result){
+                updateLog(data.Result);
+            }
+        },
+        error: function (data) {
+            loghelper("There was a problem, check the console!");
+            console.log("Problem:");
+            console.log(data);
+        },
+    });
+});
+
+// popup for example data
+
+
+$b64contents.data('powertipjq', $(
+    "<p><strong>Don't know what to write here?</strong></p>" +
+    '<p><button class="inserttestdata">Insert Testdata</button> or<a href="https://www.base64decode.org/"> click here</a></p>' +
+    '<p><a href="https://www.base64decode.org/">to learn how to encode your data to b64</a></p>'
+))
+.powerTip({
+    placement: 'e',
+    mouseOnToPopup: true
+});
+
+
+    
+$(document.body).on("mousedown", "button.inserttestdata",function(e){
+    $b64contents.val(testdata);
+    console.log("b64contents to be filled");
+    e.preventDefault();
+})
+
+
+
+    </script>
+}

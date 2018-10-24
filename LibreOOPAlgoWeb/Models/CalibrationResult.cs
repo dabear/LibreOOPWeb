@@ -17,6 +17,7 @@ namespace LibreOOPWeb.Models
         public double? slope_offset { get; set; }
         public double? offset_offset { get; set; }
         public double? offset_slope { get; set; }
+        public string uuid { get; set; }
 
     }
 }

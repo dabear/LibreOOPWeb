@@ -30,6 +30,29 @@ namespace LibreOOPWeb.Controllers
             return View();
         }
 
+        public async Task<ActionResult> CalibrateSensor()
+        {
+            var shouldNotify = false;
+            var secondsOff = 0;
+            try
+            {
+                var d = (await MongoConnection.GetLatestPing()).Value;
+                var diff = DateTime.Now - d;
+                secondsOff = Convert.ToInt32(diff.TotalSeconds);
+                shouldNotify = diff.TotalSeconds > 40;
+
+            }
+            catch (InvalidOperationException)
+            {
+
+
+            }
+            ViewBag.shouldNotify = shouldNotify;
+            ViewBag.secondsOff = secondsOff;
+
+            return View("CalibrateSensor");
+        }
+
         public async Task<ActionResult> UploadRawReading() {
             var shouldNotify = false;
             var secondsOff = 0;

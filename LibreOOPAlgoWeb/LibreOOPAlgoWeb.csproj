@@ -275,6 +275,7 @@
     <Content Include="Views\Home\UploadRawReading.cshtml" />
     <Content Include="Content\jquery.powertip.min.css" />
     <Content Include="Content\jquery.powertip.min.js" />
+    <Content Include="Views\Home\CalibrateSensor.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

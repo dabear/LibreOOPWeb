@@ -76,6 +76,12 @@ namespace LibreOOPWeb.Controllers
             }
             //testing only
             //b64contents = Convert.ToBase64String(LibreUtils.TestPatchAlwaysReturning63);
+            //2018-10-07 patch
+            //b64contents = "hNtgFwMAAAAAAAAAAAAAAAAAAAAAAAAA+SIECI4EyPRXAKIEyOxXALUEyORXAMgEyNxXADEEyJBYADEEyIBYADEEyGxYADIEyFxYADUEyFBYADoEyEBYAEEEyDRYAEgEyChYAFIEyCBYAF4EyBRYAG4EyAxYAH4EyABYANwEyIhZAEUEyHRZAJoDyExZAEwDyFBZAEsDyMRZAKUDyOwZgLADyAhaADMEyFxYACgFyKRZAC0FyExaAN0EyCQbgKMEyLxZAAQEyPgagK4DyChaAKwDyMRZAAkEyAhZACAEyGRZAOsDyGBZACQEyJhZAPQDyPwagP0DyPBZABMEyLwbgBoEyDgbgK8DyPBbAIkDiOYbgP4DiHJdgL0EyNwbgCIGyNQagLIHyDwagFYHyORZAGoGyMBZACoFyKhZACUGAACWLgABYwddURQHloBaAO2mEHoayATReG4=";
+            //2018-08-14 patch
+            //b64contents = "p/g4FQMAAAAAAAAAAAAAAAAAAAAAAAAA+4MAAH4DyHRXAn4DyIiXAoMDyJyXAosDyKSXApADyKRXApEDyKyXApkDyLCXAp8DyLiXAqMDyMCXArADyMRXAqwDyMxXAq0DyNSXArEDyLhXAs4DyJyXAtQDyLyXAtsDyMyXAhwEyIzVAvkDyHCWAvADyFAVAwsEyKhWAngDyARXAl0DyBiYAjEDyCyYAh8DyPCWAgwDyHiWAuYCyJiWAuUCyGiWAicDyEjVAisDyFjVAhgDyDjVAhMDyNQUA/QCyHQUA/ACyBjVAtACyCDVAgsDyBQVA8sCyPCWAh8DyKTZATwDyGzaAXEDyCTaAZADyBTaAZ0DyPRXAs4DyNhWAlEDyByXAjwDyFzVAlADyNSVAnADyPhWAkUDyMCWAn4DyHBXAtEwAADISAABBgcYURQHloBaAO2mAG4ayASz2GI=";
+
+
             try
             {
                 //database expects a base64, which we already have
@@ -229,7 +235,7 @@ namespace LibreOOPWeb.Controllers
             }
             if(reqb1.status != "complete" || reqb2.status != "complete" || reqf1.status != "complete" || reqf2.status != "complete")
             {
-                return Success<CalibrationResult>(new CalibrationResult { status = "not-ready" }, "GetCalibrationStatus");
+                return Success<CalibrationResult>(new CalibrationResult { status = "not-ready" , uuid=uuid}, "GetCalibrationStatus");
             }
 
             
@@ -262,7 +268,8 @@ namespace LibreOOPWeb.Controllers
                 slope_offset = slope_offset,
                 slope_slope = slope_slope,
 
-                status = "complete"
+                status = "complete",
+                uuid = uuid
             };
 
             return Success<CalibrationResult>(result, "GetCalibrationStatus");
