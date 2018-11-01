@@ -104,7 +104,7 @@ namespace LibreOOPWeb.Controllers
                 return this.Error("CreateCalibrationRequestAsync Denied: Invalid checksums");
             }
             //modify sensorstatusbyte to a "ready" state
-            decoded[4] = 0x04;
+            decoded[4] = 0x03;
 
             var uuids = new List<String>();
             uuids.Add("b1-cal-" + Guid.NewGuid());

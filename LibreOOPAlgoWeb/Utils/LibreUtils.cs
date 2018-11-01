@@ -185,9 +185,21 @@ namespace LibreOOPWeb.Utils
             }
 
             var modifiedPatch = new List<byte[]>();
+            //changes sensorstatusbyte to ready
+            patch[4] = 0x03;
 
-            //24 bytes of header + 4 bytes of body(crc, trend and history index
-            modifiedPatch.Add(new ArraySegment<byte>(patch,0,28).ToArray());
+            //24 bytes of header 
+            modifiedPatch.Add(new ArraySegment<byte>(patch,0,24).ToArray());
+
+            // + 4 bytes of body(crc, trend and history index
+            // this could be from the original patch, but wouldn't work for sensors
+            // warming up or pre-initialixing,
+            // so fill it with trend and history from a known good patch
+            // no matter what we will fix the crcs with bytesWithCorrectCRC()
+            // anyway
+
+            //modifiedPatch.Add(new ArraySegment<byte>(patch, 24, 4).ToArray());
+            modifiedPatch.Add(new ArraySegment<byte>(LibreUtils.TestPatchAlwaysReturning63, 24, 4).ToArray());
 
 
 
@@ -197,11 +209,18 @@ namespace LibreOOPWeb.Utils
                 modifiedPatch.Add(value);
             }
 
-            modifiedPatch.Add(new ArraySegment<byte>(patch, 316, 28).ToArray());
+            //rest of data, minute counter and two zeroes
+            //modifiedPatch.Add(new ArraySegment<byte>(patch, 316, 4).ToArray());
+            modifiedPatch.Add(new ArraySegment<byte>(LibreUtils.TestPatchAlwaysReturning63, 316, 4).ToArray());
+
+            //footer
+            modifiedPatch.Add(new ArraySegment<byte>(patch, 320, 24).ToArray());
+
+            var flattened = modifiedPatch.SelectMany(x => x).ToArray();
 
 
-            var res = LibreUtils.bytesWithCorrectCRC(modifiedPatch.SelectMany(x => x).ToArray());
-            return res;
+
+            return LibreUtils.bytesWithCorrectCRC(flattened);
         }
 
     }
