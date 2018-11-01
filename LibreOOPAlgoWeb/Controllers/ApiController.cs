@@ -69,6 +69,7 @@ namespace LibreOOPWeb.Controllers
 
         public async Task<ActionResult> CreateCalibrationRequestAsync(string accesstoken, string b64contents){
             byte[] decoded = null;
+            double? footerCRCS = null;
 
             if (!await this.checkUploadPermissions(accesstoken))
             {
@@ -87,6 +88,7 @@ namespace LibreOOPWeb.Controllers
                 //database expects a base64, which we already have
                 // this is just to verify that the contents is valid as base64
                 decoded = Convert.FromBase64String(b64contents);
+
             }
             catch (Exception)
             {
@@ -94,14 +96,28 @@ namespace LibreOOPWeb.Controllers
             }
 
 
+
             if (decoded == null || decoded.Count() != LibreUtils.TestPatchAlwaysReturning63.Count())
             {
                 return this.Error("CreateCalibrationRequestAsync Denied: Invalid length");
             }
 
+
+
+
             if (!LibreUtils.verify(decoded))
             {
                 return this.Error("CreateCalibrationRequestAsync Denied: Invalid checksums");
+            }
+
+            try
+            {
+                footerCRCS = LibreUtils.CalculateFooterCRCs(decoded);
+            }
+            catch
+            {
+                return this.Error("CreateCalibrationRequestAsync Denied: could not extract footer crcs ");
+
             }
             //modify sensorstatusbyte to a "ready" state
             decoded[4] = 0x03;
@@ -114,6 +130,8 @@ namespace LibreOOPWeb.Controllers
             
             try
             {
+                //these calls must not changebody crcs in any way
+
                 var b1 = Convert.ToBase64String(LibreUtils.CreateFakePatch(patch: decoded, raw_glucose: DefaultAlgorithmThresholds.GLUCOSE_LOWER_BOUND, raw_temp: DefaultAlgorithmThresholds.RAW_TEMP1));
 
                 var b2 = Convert.ToBase64String(LibreUtils.CreateFakePatch(patch: decoded, raw_glucose: DefaultAlgorithmThresholds.GLUCOSE_UPPER_BOUND, raw_temp: DefaultAlgorithmThresholds.RAW_TEMP1));
@@ -147,7 +165,7 @@ namespace LibreOOPWeb.Controllers
                     RAW_TEMP1 = DefaultAlgorithmThresholds.RAW_TEMP1,
                     RAW_TEMP2 = DefaultAlgorithmThresholds.RAW_TEMP2
                 };
-                
+
 
                 cal = new LibreCalibrationModel
                 {
@@ -155,7 +173,8 @@ namespace LibreOOPWeb.Controllers
                     ModifiedOn = DateTime.Now,
                     uuid = "calibrationmetadata-" + Guid.NewGuid(),
                     metadata = metadata,
-                    requestids = uuids
+                    requestids = uuids,
+                    isValidForFooterWithReverseCRCs = LibreUtils.CalculateFooterCRCs(decoded)
 
 
                 };
@@ -210,6 +229,7 @@ namespace LibreOOPWeb.Controllers
             {
                 return this.Error("GetCalibrationStatus Failed: calibrationrequest was malformed, aborting");
             }
+            var footerCRCS = cal.isValidForFooterWithReverseCRCs;
 
             LibreReadingModel reqb1;
             LibreReadingModel reqb2;
@@ -269,8 +289,9 @@ namespace LibreOOPWeb.Controllers
                 slope_slope = slope_slope,
 
                 status = "complete",
-                uuid = uuid
-            };
+                uuid = uuid,
+                isValidForFooterWithReverseCRCs = footerCRCS 
+        };
 
             return Success<CalibrationResult>(result, "GetCalibrationStatus");
 

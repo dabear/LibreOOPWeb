@@ -108,11 +108,17 @@ namespace LibreOOPWeb.Utils
             return crc == ((data[start + 1] & 0xFF) * 256 + (data[start] & 0xff));
         }
 
+
+        public static long CalculateHeaderCRCs(byte[] data) => computeCRC16(data, 0, 24); 
+        public static long CalculateBodyCRCs(byte[] data) => computeCRC16(data, 24, 296);
+        public static long CalculateFooterCRCs(byte[] data) => computeCRC16(data, 320, 24);
+       
+
         public static byte[] bytesWithCorrectCRC(byte[] data)
         {
-            var headerCrc = computeCRC16(data, 0, 24);
-            var bodyCrc = computeCRC16(data, 24, 296);
-            var footerCrc = computeCRC16(data, 320, 24);
+            var headerCrc = CalculateHeaderCRCs(data);
+            var bodyCrc = CalculateBodyCRCs(data);
+            var footerCrc = CalculateFooterCRCs(data);
 
             byte[] copy = new byte[data.Length];
             data.CopyTo(copy, 0);

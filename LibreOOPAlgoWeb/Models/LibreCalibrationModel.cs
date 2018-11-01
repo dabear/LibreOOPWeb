@@ -27,6 +27,7 @@ namespace LibreOOPWeb.Models
         public string uuid { get; set; }
         public AlgorithmMetadata metadata{ get; set; }
         public List<String> requestids { get; set; }
+        public long isValidForFooterWithReverseCRCs { get; set; }
 
 
     }

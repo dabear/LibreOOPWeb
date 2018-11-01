@@ -11,13 +11,14 @@ namespace LibreOOPWeb.Models
         public CalibrationResult()
         {
         }
-       
+
         public string status { get; set; }
         public double? slope_slope { get; set; }
         public double? slope_offset { get; set; }
         public double? offset_offset { get; set; }
         public double? offset_slope { get; set; }
         public string uuid { get; set; }
+        public double? isValidForFooterWithReverseCRCs { get; set; }
 
-    }
+}
 }
