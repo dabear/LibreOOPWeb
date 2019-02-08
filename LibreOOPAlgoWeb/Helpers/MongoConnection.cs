@@ -21,21 +21,21 @@ namespace LibreOOPWeb.Helpers
         
         public static IMongoCollection<LibreReadingModel> GetReadingsCollection() {
             
-            var db = mongoClient.GetDatabase("bjorninge_libreoopweb");
+            var db = mongoClient.GetDatabase("bjorninge_libreoopweb2");
             return db.GetCollection<LibreReadingModel>("librereadings");
         }
 
         public static IMongoCollection<LibreCalibrationModel> GetCalibrationCollection()
         {
 
-            var db = mongoClient.GetDatabase("bjorninge_libreoopweb");
+            var db = mongoClient.GetDatabase("bjorninge_libreoopweb2");
             return db.GetCollection<LibreCalibrationModel>("librecalibrations");
         }
 
         public static IMongoCollection<PingModel> GetPingCollection()
         {
             
-            var db = mongoClient.GetDatabase("bjorninge_libreoopweb");
+            var db = mongoClient.GetDatabase("bjorninge_libreoopweb2");
             return db.GetCollection<PingModel>("libreping");
         }
 
