@@ -23,7 +23,10 @@ namespace LibreOOPWeb.Controllers
 
             await MongoConnection.DeleteExpiredTempEntries();
 
-
+            if(String.IsNullOrWhiteSpace(accesstoken)) {
+                //don't bother stressing the database with an obvious incorrect accesstoken
+                return "unknown";
+            }
 
             var salt = Config.NsHost + "verifyToken";
 
