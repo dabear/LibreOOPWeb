@@ -1,7 +1,7 @@
 ﻿################################################################################
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
-
+LibreOOPAlgoWeb/obj/Debug/
 /NightscoutShareServer/obj/Debug
 /NightscoutShareServer/obj/Release
 /NightscoutShareServer/bin

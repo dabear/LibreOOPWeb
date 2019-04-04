@@ -10,14 +10,46 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using LibreOOPWeb.Models;
-
+using System.Security.Cryptography;
+using System.Text;
 
 namespace LibreOOPWeb.Controllers
 {
     public class ApiController : Controller
     {
-        
+        //public facing version of checkUploadPermissions
+        public async Task<string> verifyToken(string accesstoken)
+        {
 
+            await MongoConnection.DeleteExpiredTempEntries();
+
+
+
+            var salt = Config.NsHost + "verifyToken";
+
+            var crypt = new System.Security.Cryptography.SHA256Managed();
+            var hash = new System.Text.StringBuilder();
+            byte[] crypto = crypt.ComputeHash(Encoding.UTF8.GetBytes(salt+accesstoken));
+            foreach (byte theByte in crypto)
+            {
+                hash.Append(theByte.ToString("x2"));
+            }
+            var temp =hash.ToString();
+
+            await MongoConnection.AsyncInsertTempPassword(temp);
+
+            var nonExpiredDuplicates = await MongoConnection.countNonExpiredTempEntries(temp);
+
+            //more than x number of attempts the last couple of hours, prevent abuse, display unknown
+            if (nonExpiredDuplicates > 5) {
+                return "unknown";
+            }
+
+
+            var isValid =  await NightscoutPermissions.CheckUploadPermissions(accesstoken);
+
+            return isValid ? "valid" : "unknown";
+        }
 
         private async Task<bool> checkUploadPermissions(string accesstoken){
             //return true;

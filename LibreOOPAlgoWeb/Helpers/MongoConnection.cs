@@ -32,6 +32,13 @@ namespace LibreOOPWeb.Helpers
             return db.GetCollection<LibreCalibrationModel>("librecalibrations");
         }
 
+        public static IMongoCollection<PasswordTemp> GetTempCollection()
+        {
+
+            var db = mongoClient.GetDatabase("bjorninge_libreoopweb2");
+            return db.GetCollection<PasswordTemp>("temp");
+        }
+
         public static IMongoCollection<PingModel> GetPingCollection()
         {
             
@@ -49,6 +56,47 @@ namespace LibreOOPWeb.Helpers
 
             await GetReadingsCollection().InsertOneAsync(reading);
 
+        }
+
+        public async static Task AsyncInsertTempPassword(string temp)
+        {
+            var m = new PasswordTemp { 
+                CreatedOn = DateTime.Now, 
+                HashedPassword = temp 
+            };
+
+            await GetTempCollection().InsertOneAsync(m);
+
+        }
+
+        public async static Task<int> countNonExpiredTempEntries(string temp) {
+
+            var filter1 = Builders<PasswordTemp>.Filter.Eq("HashedPassword", temp);
+
+            var dateInThePast = DateTime.Now.AddHours(Config.HoursInThePastForPasswordCheck);
+            var filter2 = Builders<PasswordTemp>.Filter.Gte("CreatedOn", dateInThePast);
+
+            var complexFilter = Builders<PasswordTemp>.Filter.And(new[] { filter1, filter2 });
+
+            var options = new FindOptions<PasswordTemp, PasswordTemp> { Limit = 100 };
+
+
+
+            var list = await GetTempCollection().FindAsync(complexFilter, options).Result.ToListAsync();
+
+            return list.Count;
+
+
+        }
+
+        public async static Task<bool> DeleteExpiredTempEntries()
+        {
+            var collection = GetTempCollection();
+            var dateInThePast = DateTime.Now.AddHours(Config.HoursInThePastForPasswordCheck);
+            var filter = Builders<PasswordTemp>.Filter.Lte("CreatedOn", dateInThePast);
+
+            await collection.DeleteManyAsync(filter);
+            return true;
         }
 
         public async static Task<LibreCalibrationModel> GetCalibration(string uuid)

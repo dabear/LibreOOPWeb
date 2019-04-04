@@ -180,6 +180,7 @@
     <Compile Include="Models\LibreReadingModel.cs" />
     <Compile Include="Models\UptimeModel.cs" />
     <Compile Include="Helpers\LibreTestData.cs" />
+    <Compile Include="Models\PasswordTemp.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\loop-source-change-url.png" />
