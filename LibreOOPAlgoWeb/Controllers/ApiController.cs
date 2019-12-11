@@ -23,7 +23,7 @@ namespace LibreOOPWeb.Controllers
 
             await MongoConnection.DeleteExpiredTempEntries();
 
-            if(String.IsNullOrWhiteSpace(accesstoken)) {
+            if (String.IsNullOrWhiteSpace(accesstoken)) {
                 //don't bother stressing the database with an obvious incorrect accesstoken
                 return "unknown";
             }
@@ -32,12 +32,12 @@ namespace LibreOOPWeb.Controllers
 
             var crypt = new System.Security.Cryptography.SHA256Managed();
             var hash = new System.Text.StringBuilder();
-            byte[] crypto = crypt.ComputeHash(Encoding.UTF8.GetBytes(salt+accesstoken));
+            byte[] crypto = crypt.ComputeHash(Encoding.UTF8.GetBytes(salt + accesstoken));
             foreach (byte theByte in crypto)
             {
                 hash.Append(theByte.ToString("x2"));
             }
-            var temp =hash.ToString();
+            var temp = hash.ToString();
 
             await MongoConnection.AsyncInsertTempPassword(temp);
 
@@ -49,22 +49,22 @@ namespace LibreOOPWeb.Controllers
             }
 
 
-            var isValid =  await NightscoutPermissions.CheckUploadPermissions(accesstoken);
+            var isValid = await NightscoutPermissions.CheckUploadPermissions(accesstoken);
 
             return isValid ? "valid" : "unknown";
         }
 
-        private async Task<bool> checkUploadPermissions(string accesstoken){
+        private async Task<bool> checkUploadPermissions(string accesstoken) {
             //return true;
             return await NightscoutPermissions.CheckUploadPermissions(accesstoken);
         }
 
-        private async Task<bool> checkProcessingPermissions(string process_token){
+        private async Task<bool> checkProcessingPermissions(string process_token) {
             //return true;
             return await NightscoutPermissions.CheckProcessPermissions(process_token);
         }
 
-        private ActionResult Error(string msg){
+        private ActionResult Error(string msg) {
             return Json(
                 new
                 {
@@ -72,8 +72,8 @@ namespace LibreOOPWeb.Controllers
                     Message = msg
                 },
                 JsonRequestBehavior.AllowGet);
-        } 
-        private ActionResult Success<T>(T result, string command){
+        }
+        private ActionResult Success<T>(T result, string command) {
             return Json(
                 new
                 {
@@ -82,8 +82,8 @@ namespace LibreOOPWeb.Controllers
                     Result = result
                 },
                 JsonRequestBehavior.AllowGet);
-        } 
-        public async Task<ActionResult> DeleteTestReadings(string processing_accesstoken){
+        }
+        public async Task<ActionResult> DeleteTestReadings(string processing_accesstoken) {
             if (!await this.checkProcessingPermissions(processing_accesstoken))
             {
                 return this.Error("DeleteTestReadings Denied");
@@ -92,7 +92,7 @@ namespace LibreOOPWeb.Controllers
             try
             {
                 await MongoConnection.DeleteTestReadings();
-            } catch(Exception ex) {
+            } catch (Exception ex) {
                 return this.Error("DeleteTestReadings Failed: " + ex.Message);
             }
 
@@ -100,9 +100,9 @@ namespace LibreOOPWeb.Controllers
 
         }
 
-   
 
-        public async Task<ActionResult> CreateCalibrationRequestAsync(string accesstoken, string b64contents){
+
+        public async Task<ActionResult> CreateCalibrationRequestAsync(string accesstoken, string b64contents) {
             byte[] decoded = null;
             double? footerCRCS = null;
 
@@ -162,7 +162,7 @@ namespace LibreOOPWeb.Controllers
             uuids.Add("b2-cal-" + Guid.NewGuid());
             uuids.Add("f1-cal-" + Guid.NewGuid());
             uuids.Add("f2-cal-" + Guid.NewGuid());
-            
+
             try
             {
                 //these calls must not changebody crcs in any way
@@ -174,7 +174,7 @@ namespace LibreOOPWeb.Controllers
                 var f1 = Convert.ToBase64String(LibreUtils.CreateFakePatch(patch: decoded, raw_glucose: DefaultAlgorithmThresholds.GLUCOSE_LOWER_BOUND, raw_temp: DefaultAlgorithmThresholds.RAW_TEMP2));
                 var f2 = Convert.ToBase64String(LibreUtils.CreateFakePatch(patch: decoded, raw_glucose: DefaultAlgorithmThresholds.GLUCOSE_UPPER_BOUND, raw_temp: DefaultAlgorithmThresholds.RAW_TEMP2));
 
-                
+
                 await MongoConnection.AsyncInsertReading(new LibreReadingModel { CreatedOn = DateTime.Now, ModifiedOn = DateTime.Now, status = "pending", b64contents = b1, uuid = uuids[0], oldState = null, currentUtcOffset = null, sensorStartTimestamp = null, sensorScanTimestamp = null, newState = null });
                 await MongoConnection.AsyncInsertReading(new LibreReadingModel { CreatedOn = DateTime.Now, ModifiedOn = DateTime.Now, status = "pending", b64contents = b2, uuid = uuids[1], oldState = null, currentUtcOffset = null, sensorStartTimestamp = null, sensorScanTimestamp = null, newState = null });
                 await MongoConnection.AsyncInsertReading(new LibreReadingModel { CreatedOn = DateTime.Now, ModifiedOn = DateTime.Now, status = "pending", b64contents = f1, uuid = uuids[2], oldState = null, currentUtcOffset = null, sensorStartTimestamp = null, sensorScanTimestamp = null, newState = null });
@@ -226,10 +226,10 @@ namespace LibreOOPWeb.Controllers
 
             }
 
-            
 
 
-           return Success<LibreCalibrationModel>(cal, "CreateCalibrationRequestAsync");
+
+            return Success<LibreCalibrationModel>(cal, "CreateCalibrationRequestAsync");
         }
 
 
@@ -260,7 +260,7 @@ namespace LibreOOPWeb.Controllers
             }
 
             var requests = cal.requestids;
-            if(requests.Count() < 4)
+            if (requests.Count() < 4)
             {
                 return this.Error("GetCalibrationStatus Failed: calibrationrequest was malformed, aborting");
             }
@@ -284,18 +284,18 @@ namespace LibreOOPWeb.Controllers
                 return Error("GetCalibrationStatus Failed: could not get remote readings: " + ex.Message);
             }
 
-            if(reqb1 == null || reqb2 == null || reqf1 == null || reqf2 == null)
+            if (reqb1 == null || reqb2 == null || reqf1 == null || reqf2 == null)
             {
                 return Error("GetCalibrationStatus Failed: could not get remote readings");
             }
-            if(reqb1.status != "complete" || reqb2.status != "complete" || reqf1.status != "complete" || reqf2.status != "complete")
+            if (reqb1.status != "complete" || reqb2.status != "complete" || reqf1.status != "complete" || reqf2.status != "complete")
             {
-                return Success<CalibrationResult>(new CalibrationResult { status = "not-ready" , uuid=uuid}, "GetCalibrationStatus");
+                return Success<CalibrationResult>(new CalibrationResult { status = "not-ready", uuid = uuid }, "GetCalibrationStatus");
             }
 
-            
 
-            
+
+
 
             var requestThresholds = cal.metadata;
             var responseb1 = LibreReadingUtil.ReadingResultToNumber(reqb1.result);
@@ -318,15 +318,15 @@ namespace LibreOOPWeb.Controllers
 
             var result = new CalibrationResult
             {
-                offset_offset= offset_offset,
+                offset_offset = offset_offset,
                 offset_slope = offset_slope,
                 slope_offset = slope_offset,
                 slope_slope = slope_slope,
 
                 status = "complete",
                 uuid = uuid,
-                isValidForFooterWithReverseCRCs = footerCRCS 
-        };
+                isValidForFooterWithReverseCRCs = footerCRCS
+            };
 
             return Success<CalibrationResult>(result, "GetCalibrationStatus");
 
@@ -335,11 +335,11 @@ namespace LibreOOPWeb.Controllers
         }
 
 
-        public async Task<ActionResult> CreateRequestAsync(string accesstoken, string b64contents, string oldState, string sensorStartTimestamp, string sensorScanTimestamp, string currentUtcOffset){
+        public async Task<ActionResult> CreateRequestAsync(string accesstoken, string b64contents, string oldState, string sensorStartTimestamp, string sensorScanTimestamp, string currentUtcOffset) {
 
             //var permissions= await NightscoutPermissions.CheckUploadPermissions(accesstoken);
             //var permissions = await NightscoutPermissions.CheckProcessPermissions(accesstoken);
-            if (! await this.checkUploadPermissions(accesstoken))
+            if (!await this.checkUploadPermissions(accesstoken))
             {
                 return this.Error("CreateRequestAsync Denied");
             }
@@ -348,14 +348,14 @@ namespace LibreOOPWeb.Controllers
             long? longCurrentUtcOffset = null;
 
 
-            if(string.IsNullOrWhiteSpace(b64contents)) {
+            if (string.IsNullOrWhiteSpace(b64contents)) {
                 return this.Error("CreateRequestAsync Denied: invalid parameter b64contents");
             }
-            try{
+            try {
                 // Database expects a base64, which we already have
                 // this is just to verify that the contents is valid as base64
                 System.Convert.FromBase64String(b64contents);
-            } catch(FormatException){
+            } catch (FormatException) {
                 return this.Error("CreateRequestAsync Denied: invalid parameter b64contents: (not a b64string)");
             }
 
@@ -376,7 +376,7 @@ namespace LibreOOPWeb.Controllers
                 {
                     return this.Error("CreateRequestAsync Denied: invalid parameter oldState: (not a b64string)");
                 }
-                longSensorStartTimestamp = Int64.TryParse(sensorStartTimestamp, out  var t1) ? t1 : (long?)null;
+                longSensorStartTimestamp = Int64.TryParse(sensorStartTimestamp, out var t1) ? t1 : (long?)null;
                 longSensorScanTimestamp = Int64.TryParse(sensorScanTimestamp, out var t2) ? t2 : (long?)null;
                 longCurrentUtcOffset = Int64.TryParse(currentUtcOffset, out var t3) ? t3 : (long?)null;
 
@@ -418,10 +418,10 @@ namespace LibreOOPWeb.Controllers
             };
 
             //return this.Error("synthax ok");
-            try{
+            try {
                 await MongoConnection.AsyncInsertReading(reading);
 
-            } catch(System.TimeoutException) {
+            } catch (System.TimeoutException) {
                 return Error("Timeout, database down?");
             }
 
@@ -429,6 +429,29 @@ namespace LibreOOPWeb.Controllers
 
             //var content = $"accesstoken: {accesstoken}, b64contents: {b64contents}, guid: {g}";
             //return Content("CreateRequestAsync IS NOT IMPLEMENTED YET:" + content);    
+        }
+
+        public async Task<ActionResult> QueueSize(string upordown) { 
+            List<LibreReadingModel> readings;
+
+            try
+            {
+                readings = await MongoConnection.GetPendingReadingsForProcessing(Config.MaxFetchPerAttempt*3);
+            }
+            catch (Exception ex)
+            {
+                return Error("QueueSize Failed: " + ex.Message);
+            }
+
+            if (upordown == "keyword")
+            {
+                // give some slack, only alert if number of processes readings
+                // inqueue are somewhat larger than the configured max queuesize
+                return Content(readings.Count > Config.MaxFetchPerAttempt + 5 ? "TooLarge" : "OK");
+            }
+
+            return Success(readings.Count.ToString(), "QueueSize");
+
         }
 
         public async Task<ActionResult> Uptime(string upordown) {
