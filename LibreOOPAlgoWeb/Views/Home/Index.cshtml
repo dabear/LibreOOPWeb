@@ -13,14 +13,14 @@
 
 
 <div>
-    <h1>Welcome to LibreOOPAlgoWebr</h1>
+    <h1>Welcome to LibreOOPWeb</h1>
         
     <p>This site allows you to submit base64 encoded streams of data for processing by tzachi's OOPAlgo. </p>
 
 
     <h2>Step 1: read an entire libre sensor packet and base64 encode it.</h2>
      <p>The following can be used as an example. It will always return 63 after processing</p>
-    <code style="white-space: pre;">
+    <pre><code>
      byte[] packet = {(byte)0x3a, (byte)0xcf, (byte)0x10, (byte)0x16, (byte)0x03, (byte)0x00, (byte)0x00, (byte)0x00,
                 (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
                 (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
@@ -66,7 +66,7 @@
                 (byte)0x0e, (byte)0x6e, (byte)0x1a, (byte)0xc8, (byte)0x04, (byte)0xdd, (byte)0x58, (byte)0x6d};  
         byte[] encoded = Base64.getEncoder().encode(packet);
         System.out.println(new String(encoded)); //this can be uploaded to libreoopweb
-    </code>
+    </code></pre>
 
      <h2>Step 2: Upload the patch data to libreoopweb</h2>
         <p>Click the button below to upload your raw sensor data. Processing of the data is async.</p>
@@ -79,7 +79,7 @@
 
 
         <hr />
-        <footer>Copyright bjorninge.no 2018. By submitting readings to this site, you transfer all the legal rights of the contents you submit to the Site owner.
+        <footer>Copyright bjorninge.no. By submitting readings to this site, you transfer all the legal rights of the contents you submit to the Site owner.
         Any and all data may be shared with vetted developers from the open source community, but the data will never be made available for commercial interests</footer>
     
 

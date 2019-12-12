@@ -12,29 +12,32 @@
     <script src="/scripts/prettyprint.js"></script>
 </head>
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                @Html.ActionLink("LibreOOPAlgoWeb", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+
+    <div class="fixed-top">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+
+                    @Html.ActionLink("LibreOOPWeb", "Index", "Home", null, new { @class = "nav-item nav-link active" })
+                    @Html.ActionLink("Home", "Index", "Home", null, new { @class = "nav-item nav-link" })
+                    @Html.ActionLink("Upload raw libre reading", "UploadRawReading", "Home", null, new { @class = "nav-item nav-link" })
+
+                    @Html.ActionLink("Calibrate Sensor", "CalibrateSensor", "Home", null, new { @class = "nav-item nav-link" })
+
+                </div>
             </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
-                    <li>@Html.ActionLink("Upload raw libre reading", "UploadRawReading", "Home")</li>
-                    <li>@Html.ActionLink("Calibrate Sensor", "CalibrateSensor", "Home")</li>
-                    <!--<li>@Html.ActionLink("Go to CustomShareServer Login", "Index", "Token")</li>
-    <li>@Html.ActionLink("Get glucose", "Index", "Glucose")</li>
-    <li>@Html.ActionLink("View logs", "ViewLogs", "Home")</li> -->
-                </ul>
-            </div>
-        </div>
+
+        </nav>
     </div>
-    <div class="container body-content">
+
+
+    <div class="container body-content" style="margin-top: 10px">
+
+
         @RenderBody()
         <hr />
         <footer></footer>
