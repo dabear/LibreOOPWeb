@@ -24,5 +24,5 @@ Setting on a processing agent requires you to create one user in nightscout that
 
 ##Known sites
 The following sites implements either fully or partially libreoopweb functionality;
-http://libreoopweb.azurewebsites.net/
-http://glucose.space/
+* http://libreoopweb.azurewebsites.net/
+* http://glucose.space/
