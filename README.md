@@ -13,11 +13,16 @@ If you consider setting up an instance of LibreOOPWeb, you should really really 
 * Go to your nightscout site admin tools. Set up two new roles
 * * libreoopprocessor - users that are members of this group are allowed to fetch, process and upload processed results
 * * libreoop - users that are members of this group are allowed to upload raw readings for processing
-* Create necessary amount of users as you see fit
+* Chttp://glucose.space/reate necessary amount of users as you see fit
 
 ## Set up a processing agent
 Setting on a processing agent requires you to create one user in nightscout that has membership with libreoopprocessor permissions
 * Build a special version of libreoopalgo, it can be found here: https://github.com/dabear/LibreOOPAlgorithm/commit/90e78de0f70fe3c01f2371aa6f7b36e21051abc5
 * Configure the LIBRE_OOP_WEB_ENABLE, LIBRE_OOP_WEB_PROCESSING_TOKEN and LIBRE_OOP_WEBSITE variables before building. 
 * The details regarding how you should build the oopalgo is out of scope for this document
-* oopalgo app needs to be run on a physical android device. Emulators are not an option. The android device's Screen must not be locked ever, or processing might stop working.
+* oopalgo app needs to be run on a physical android device. Emulators are not an option currently, but if you make it work, please share it with me.
+
+##Known sites
+The following sites implements either fully or partially libreoopweb functionality;
+http://libreoopweb.azurewebsites.net/
+http://glucose.space/
