@@ -22,7 +22,7 @@ Setting on a processing agent requires you to create one user in nightscout that
 * The details regarding how you should build the oopalgo is out of scope for this document
 * oopalgo app needs to be run on a physical android device. Emulators are not an option currently, but if you make it work, please share it with me.
 
-##Known sites
+## Known sites
 The following sites implements either fully or partially libreoopweb functionality;
 * http://libreoopweb.azurewebsites.net/
 * http://glucose.space/
